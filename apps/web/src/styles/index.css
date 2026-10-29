@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --app: 245 246 250;
+    --surface: 255 255 255;
+    --surface-2: 248 249 252;
+    --line: 229 231 235;
+    --fg: 17 24 39;
+    --muted: 107 114 128;
+    --primary: 79 70 229;
+    --primary-hover: 67 56 202;
+    --primary-soft: 238 240 255;
+    --primary-fg: 255 255 255;
+    --danger: 220 38 38;
+    --success: 22 163 74;
+    color-scheme: light;
+  }
+  .dark {
+    --app: 11 13 20;
+    --surface: 21 24 33;
+    --surface-2: 28 32 46;
+    --line: 42 47 63;
+    --fg: 229 231 235;
+    --muted: 156 163 175;
+    --primary: 129 140 248;
+    --primary-hover: 165 180 252;
+    --primary-soft: 35 38 74;
+    --primary-fg: 17 24 39;
+    --danger: 248 113 113;
+    --success: 74 222 128;
+    color-scheme: dark;
+  }
+  html, body, #root { height: 100%; }
+  body { @apply bg-app text-fg font-sans antialiased; }
+  *:focus-visible { @apply outline-none ring-2 ring-primary ring-offset-1 ring-offset-surface; }
+}
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 h-9 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none select-none; }
+  .btn-primary { @apply btn bg-primary text-primary-fg hover:bg-primary-hover shadow-sm; }
+  .btn-secondary { @apply btn bg-surface text-fg border border-line hover:bg-surface-2; }
+  .btn-ghost { @apply btn text-fg hover:bg-surface-2; }
+  .btn-danger { @apply btn bg-danger text-white hover:opacity-90; }
+  .input { @apply h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-fg placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20; }
+  .card { @apply rounded-xl border border-line bg-surface shadow-card; }
+  .menu { @apply z-50 min-w-[200px] rounded-xl border border-line bg-surface p-1.5 shadow-pop animate-fade-in; }
+  .menu-item { @apply flex w-full cursor-pointer select-none items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-fg outline-none data-[highlighted]:bg-surface-2 data-[disabled]:opacity-40; }
+  .label { @apply text-sm font-semibold text-fg; }
+  .range { @apply h-1.5 w-full cursor-pointer appearance-none rounded-full bg-line accent-primary; }
+}
+
+.range::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 9999px; background: rgb(var(--primary)); border: 3px solid white; box-shadow: 0 1px 4px rgb(0 0 0 / 0.25); }
+.range::-moz-range-thumb { height: 14px; width: 14px; border-radius: 9999px; background: rgb(var(--primary)); border: 3px solid white; }
+.scrollbar-thin { scrollbar-width: thin; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }

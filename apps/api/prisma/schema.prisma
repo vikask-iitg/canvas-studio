@@ -1,0 +1,121 @@
+generator client {
+  provider      = "prisma-client-js"
+  // rhel-openssl-3.0.x is the Vercel Functions runtime
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  // Migrations need a direct (non-pooled) connection; Neon provides DATABASE_URL_UNPOOLED.
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum Plan {
+  free
+  pro
+}
+
+enum AuthProvider {
+  email
+  google
+}
+
+enum ShareRole {
+  viewer
+  editor
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String?        @map("password_hash")
+  name         String
+  avatarUrl    String?        @map("avatar_url")
+  authProvider AuthProvider   @default(email) @map("auth_provider")
+  googleId     String?        @unique @map("google_id")
+  theme        String         @default("light")
+  plan         Plan           @default(free)
+  createdAt    DateTime       @default(now()) @map("created_at")
+  boards       Board[]
+  assets       Asset[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Board {
+  id           String       @id @default(cuid())
+  ownerId      String       @map("owner_id")
+  owner        User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title        String
+  isStarred    Boolean      @default(false) @map("is_starred")
+  thumbnailUrl String?      @map("thumbnail_url")
+  background   Json
+  content      Json
+  version      Int          @default(1)
+  templateId   String?      @map("template_id")
+  deletedAt    DateTime?    @map("deleted_at")
+  lastOpenedAt DateTime?    @map("last_opened_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  // Set explicitly on title/content edits so starring doesn't count as an edit.
+  updatedAt    DateTime     @default(now()) @map("updated_at")
+  shares       BoardShare[]
+  assets       Asset[]
+
+  @@index([ownerId, deletedAt])
+  @@index([deletedAt])
+  @@map("boards")
+}
+
+model Template {
+  id           String   @id
+  name         String
+  category     String
+  thumbnailUrl String?  @map("thumbnail_url")
+  background   Json
+  content      Json
+  isSystem     Boolean  @default(true) @map("is_system")
+  sortOrder    Int      @default(0) @map("sort_order")
+
+  @@map("templates")
+}
+
+model Asset {
+  id        String   @id @default(cuid())
+  ownerId   String   @map("owner_id")
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  boardId   String?  @map("board_id")
+  board     Board?   @relation(fields: [boardId], references: [id], onDelete: SetNull)
+  key       String
+  url       String
+  mimeType  String   @map("mime_type")
+  sizeBytes Int      @map("size_bytes")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("assets")
+}
+
+model BoardShare {
+  id        String    @id @default(cuid())
+  boardId   String    @map("board_id")
+  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  token     String?   @unique
+  userId    String?   @map("user_id")
+  role      ShareRole @default(viewer)
+  createdAt DateTime  @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  @@map("board_shares")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
