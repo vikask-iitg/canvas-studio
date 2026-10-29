@@ -23,7 +23,7 @@ An infinite whiteboard with a hand-drawn feel for sketching, mind-mapping and pl
 
 ## Live demo
 
-Hosted on Vercel at **https://canvas-studio-vikas-kumar-khurendras-projects.vercel.app**. There's no sign-up: the app opens straight to your boards, and each browser gets its own private workspace.
+Hosted on Vercel at **https://canvas-studio-tau.vercel.app**. There's no sign-up: the app opens straight to your boards, and each browser gets its own private workspace.
 
 ## Features
 
